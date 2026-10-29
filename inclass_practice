@@ -1,0 +1,277 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recycling Project: 6 Key Expressions</title>
+<style>
+  :root{--bg:#f3f8f4;--card:#fff;--ink:#1f2d27;--sub:#5b6b63;--green:#2e9e63;--green-d:#1f7a4a;--green-l:#e3f5ea;--blue:#2f7fd1;--blue-l:#e5f0fb;--red:#d6483f;--red-l:#fdeceb;--yellow:#ffd966;--line:#d9e5dd}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+  .wrap{max-width:720px;margin:0 auto;padding:14px}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  header h1{font-size:18px;margin:0}
+  #timer{font-variant-numeric:tabular-nums;font-weight:700;background:var(--card);border:1px solid var(--line);padding:4px 12px;border-radius:999px;font-size:14px}
+  #timer.low{color:var(--red);border-color:var(--red)}
+  .steps{display:flex;gap:6px;margin-bottom:12px}
+  .step{flex:1;text-align:center;font-size:12px;padding:6px 2px;border-radius:8px;background:#e3ebe6;color:var(--sub)}
+  .step.on{background:var(--green);color:#fff;font-weight:700}
+  .step.done{background:var(--green-l);color:var(--green-d)}
+  .card{background:var(--card);border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+  h2{margin:0 0 4px;font-size:20px}
+  .guide{color:var(--sub);font-size:14px;margin:0 0 14px}
+  .passage{font-size:18px;line-height:2;background:#fbfdfb;border:1px solid var(--line);border-radius:12px;padding:14px}
+  .hl{background:var(--yellow);border-radius:6px;padding:1px 6px;cursor:pointer;font-weight:700;border:none;font-size:inherit;font-family:inherit;color:inherit}
+  .hl.seen{background:#bfe8cf}
+  .hl.active{outline:3px solid var(--blue)}
+  .info{margin-top:12px;min-height:110px;background:var(--blue-l);border-radius:12px;padding:12px 14px}
+  .info .t{font-size:20px;font-weight:800;color:var(--blue)}
+  .info .ko{font-weight:700}
+  .info .ex{font-style:italic;margin-top:4px}
+  .btn{display:inline-block;border:none;border-radius:12px;padding:12px 20px;font-size:16px;font-weight:700;cursor:pointer;background:var(--green);color:#fff;font-family:inherit}
+  .btn:disabled{background:#b8c7be;cursor:not-allowed}
+  .btn.ghost{background:#fff;color:var(--green-d);border:2px solid var(--green)}
+  .right{text-align:right;margin-top:14px}
+  .count{color:var(--sub);font-size:14px;float:left;margin-top:12px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:520px){.grid2{grid-template-columns:1fr}}
+  .def,.chip{border:2px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;cursor:pointer;font-size:15px;text-align:left;font-family:inherit;color:var(--ink)}
+  .chip{font-weight:700;font-size:16px}
+  .def.sel{border-color:var(--blue);background:var(--blue-l)}
+  .def.ok,.chip.ok{border-color:var(--green);background:var(--green-l);color:var(--green-d);cursor:default}
+  .shake{animation:sh .35s;border-color:var(--red)!important;background:var(--red-l)!important}
+  @keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .col{display:flex;flex-direction:column;gap:8px}
+  .q{font-size:20px;line-height:1.7;margin:10px 0 14px}
+  .blank{display:inline-block;min-width:110px;border-bottom:3px solid var(--ink);text-align:center;font-weight:800}
+  .blank.ok{color:var(--green-d);border-color:var(--green)}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:520px){.opts{grid-template-columns:1fr}}
+  .opt{border:2px solid var(--line);background:#fff;border-radius:12px;padding:12px;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink)}
+  .opt.ok{border-color:var(--green);background:var(--green-l)}
+  .opt.no{border-color:var(--red);background:var(--red-l)}
+  .fb{margin-top:12px;padding:10px 12px;border-radius:12px;font-size:15px}
+  .fb.ok{background:var(--green-l)}
+  .fb.no{background:var(--red-l)}
+  textarea{width:100%;min-height:90px;border:2px solid var(--line);border-radius:12px;padding:10px;font-size:17px;font-family:inherit}
+  .tag{display:inline-block;background:var(--yellow);padding:2px 10px;border-radius:999px;font-weight:800}
+  .big{font-size:42px;text-align:center;margin:6px 0}
+  .res{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .res div{border-radius:10px;padding:8px 10px;font-size:15px}
+  .res .g{background:var(--green-l)}
+  .res .r{background:var(--red-l)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>♻️ Recycling Project Quest</h1>
+    <div id="timer">10:00</div>
+  </header>
+  <div class="steps" id="steps"></div>
+  <div class="card" id="app"></div>
+</div>
+
+<script>
+const EXPS = [
+  {id:'findout', base:'find out', ko:'알아내다', def:'to get information about something', ex:'We want to find out how much waste our school makes.', re:/\b(find|finds|found|finding) out\b/i, model:'I want to find out what time the library opens.'},
+  {id:'setup', base:'set up', ko:'설치하다, 마련하다', def:'to put something in place or prepare it', ex:'They set up recycling boxes for paper and plastic.', re:/\b(set|sets|setting) up\b/i, model:'We set up a small club for English movies.'},
+  {id:'sortout', base:'sort out', ko:'분류하다, 정리하다', def:'to separate things into groups or organize them', ex:'Please sort out the paper and the plastic.', re:/\b(sort|sorts|sorted|sorting) out\b/i, model:'I sorted out my old books and gave some to my cousin.'},
+  {id:'payatt', base:'pay attention to', ko:'~에 주의를 기울이다', def:'to listen to or look at something carefully', ex:'Many students did not pay attention to the signs.', re:/\b(pay|pays|paid|paying) attention to\b/i, model:'I always pay attention to my teacher in class.'},
+  {id:'comeup', base:'come up with', ko:'(아이디어를) 떠올리다', def:'to think of an idea or a plan', ex:'The team came up with a simple points game.', re:/\b(come|comes|came|coming) up with\b/i, model:'My friends and I came up with a funny idea for the school festival.'},
+  {id:'carryout', base:'carry out', ko:'실행하다, 수행하다', def:'to do a plan or a job until it is finished', ex:'They carried out the plan for an entire month.', re:/\b(carry|carries|carried|carrying) out\b/i, model:'We carried out our plan and cleaned the park.'}
+];
+const byId = Object.fromEntries(EXPS.map(e=>[e.id,e]));
+
+const QUIZ = [
+  {id:'findout', s:'Nobody is telling the truth. Can you ___ who broke the window?', ans:'find out', opts:['find out','set up','carry out','pay attention to'], why:'"find out"은 정보나 사실을 알아낸다는 뜻이에요. 범인이 누구인지 알아내는 상황이죠.'},
+  {id:'setup', s:'Please ___ the tables and chairs before the class party starts.', ans:'set up', opts:['sort out','set up','find out','come up with'], why:'"set up"은 무언가를 준비하고 마련한다는 뜻이에요. 파티 전에 테이블을 준비하는 상황이죠.'},
+  {id:'sortout', s:'My desk is a mess. I need to ___ my books and papers.', ans:'sort out', opts:['sort out','carry out','pay attention to','find out'], why:'"sort out"은 종류별로 나누거나 정리한다는 뜻이에요. 어질러진 책상을 정리하는 상황이죠.'},
+  {id:'payatt', s:'Minho didn\'t ___ the teacher, so he missed the homework.', ans:'pay attention to', opts:['come up with','pay attention to','carry out','set up'], why:'"pay attention to"는 ~에 주의를 기울인다는 뜻이에요. 뒤에 명사(the teacher)가 바로 오는 것도 기억하세요!'},
+  {id:'comeup', s:'Our team ___ a great idea for the school festival yesterday.', ans:'came up with', opts:['carried out','sorted out','came up with','found out'], why:'"come up with"는 아이디어를 떠올린다는 뜻이에요. yesterday가 있으니 과거형 came을 써야 해요.'},
+  {id:'carryout', s:'It is not enough to talk. We must ___ the plan.', ans:'carry out', opts:['find out','carry out','pay attention to','set up'], why:'"carry out"은 계획이나 일을 실제로 실행한다는 뜻이에요. must 뒤라서 동사원형을 써요.'}
+];
+
+const STAGES = ['1 Read','2 Match','3 Fill in','4 Write','5 Result'];
+let stage = 0;
+let mistakes = {}; EXPS.forEach(e=>mistakes[e.id]=0);
+let quizCorrect = 0;
+let startTime = Date.now();
+
+const app = document.getElementById('app');
+
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+function renderSteps(){
+  document.getElementById('steps').innerHTML = STAGES.map((n,i)=>`<div class="step ${i===stage?'on':i<stage?'done':''}">${n}</div>`).join('');
+}
+function go(n){stage=n;renderSteps();[renderLearn,renderMatch,renderQuiz,renderWrite,renderResult][n]();window.scrollTo(0,0)}
+
+/* timer: gentle, never blocks the activity */
+setInterval(()=>{
+  const left = Math.max(0, 600 - Math.floor((Date.now()-startTime)/1000));
+  const t = document.getElementById('timer');
+  t.textContent = String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');
+  t.classList.toggle('low', left<=60);
+},500);
+
+/* ---------- Stage 1: Read & Discover ---------- */
+function renderLearn(){
+  const seen = new Set();
+  const P = (id,txt)=>`<button class="hl" data-id="${id}">${txt}</button>`;
+  app.innerHTML = `
+    <h2>📖 Read & Discover</h2>
+    <p class="guide">노란색 표현을 눌러 뜻과 예문을 확인하세요. 6개를 모두 눌러 보세요!</p>
+    <div class="passage">
+      A group of students wanted to ${P('findout','find out')} how much waste their school produced each day.
+      They decided to ${P('setup','set up')} recycling boxes for paper and plastic.
+      They also asked classmates to ${P('sortout','sort out')} their waste carefully.
+      At first, many students did not ${P('payatt','pay attention to')} the recycling signs, so the team
+      ${P('comeup','came up with')} a simple points game.
+      With more students joining the project, the team was able to ${P('carryout','carry out')} the plan for an entire month.
+    </div>
+    <div class="info" id="info"><span style="color:var(--sub)">👆 표현을 눌러 보세요.</span></div>
+    <span class="count" id="cnt">0 / 6</span>
+    <div class="right"><button class="btn" id="next" disabled>Next ▶</button></div>`;
+  app.querySelectorAll('.hl').forEach(b=>b.onclick=()=>{
+    const e = byId[b.dataset.id];
+    seen.add(e.id);
+    app.querySelectorAll('.hl').forEach(x=>x.classList.remove('active'));
+    b.classList.add('seen','active');
+    document.getElementById('info').innerHTML = `<div class="t">${e.base}</div><div class="ko">${e.ko}</div><div>${e.def}</div><div class="ex">“${e.ex}”</div>`;
+    document.getElementById('cnt').textContent = seen.size+' / 6';
+    if(seen.size===6) document.getElementById('next').disabled=false;
+  });
+  document.getElementById('next').onclick=()=>go(1);
+}
+
+/* ---------- Stage 2: Match ---------- */
+function renderMatch(){
+  let sel = null, done = 0;
+  const defs = shuffle(EXPS), chips = shuffle(EXPS);
+  app.innerHTML = `
+    <h2>🔗 Match the Meaning</h2>
+    <p class="guide">왼쪽에서 뜻을 먼저 고른 뒤, 오른쪽에서 알맞은 표현을 누르세요.</p>
+    <div class="grid2">
+      <div class="col" id="L">${defs.map(e=>`<button class="def" data-id="${e.id}">${e.def}<br><small style="color:var(--sub)">(${e.ko})</small></button>`).join('')}</div>
+      <div class="col" id="R">${chips.map(e=>`<button class="chip" data-id="${e.id}">${e.base}</button>`).join('')}</div>
+    </div>
+    <div class="right"><button class="btn" id="next" disabled>Next ▶</button></div>`;
+  const L = [...document.querySelectorAll('#L .def')], R = [...document.querySelectorAll('#R .chip')];
+  L.forEach(d=>d.onclick=()=>{
+    if(d.classList.contains('ok')) return;
+    L.forEach(x=>x.classList.remove('sel'));
+    d.classList.add('sel'); sel = d;
+  });
+  R.forEach(c=>c.onclick=()=>{
+    if(c.classList.contains('ok') || !sel) return;
+    if(sel.dataset.id === c.dataset.id){
+      sel.classList.remove('sel'); sel.classList.add('ok'); c.classList.add('ok'); sel=null; done++;
+      if(done===6) document.getElementById('next').disabled=false;
+    } else {
+      mistakes[sel.dataset.id]++;
+      c.classList.add('shake'); setTimeout(()=>c.classList.remove('shake'),400);
+    }
+  });
+  document.getElementById('next').onclick=()=>go(2);
+}
+
+/* ---------- Stage 3: Fill in the blank ---------- */
+function renderQuiz(){
+  const items = shuffle(QUIZ);
+  let i = 0;
+  function show(){
+    const q = items[i];
+    app.innerHTML = `
+      <h2>✏️ Fill in the Blank</h2>
+      <p class="guide">문장에 알맞은 표현을 고르세요. 시제와 문장 형태도 살펴보세요. (${i+1} / ${items.length})</p>
+      <div class="q">${esc(q.s).replace('___','<span class="blank" id="bl">&nbsp;</span>')}</div>
+      <div class="opts">${shuffle(q.opts).map(o=>`<button class="opt">${o}</button>`).join('')}</div>
+      <div id="fb"></div>
+      <div class="right"><button class="btn" id="next" style="display:none">${i===items.length-1?'Finish ▶':'Next ▶'}</button></div>`;
+    let answered = false;
+    app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+      if(answered) return; answered = true;
+      const ok = b.textContent === q.ans;
+      if(ok) quizCorrect++; else mistakes[q.id]++;
+      app.querySelectorAll('.opt').forEach(x=>{
+        if(x.textContent===q.ans) x.classList.add('ok');
+        else if(x===b) x.classList.add('no');
+      });
+      const bl = document.getElementById('bl'); bl.textContent = q.ans; bl.classList.add('ok');
+      document.getElementById('fb').innerHTML = `<div class="fb ${ok?'ok':'no'}">${ok?'🎉 Great!':'🤔 Not quite.'} ${q.why}</div>`;
+      document.getElementById('next').style.display='inline-block';
+    });
+    document.getElementById('next').onclick=()=>{ i++; i<items.length ? show() : go(3); };
+  }
+  show();
+}
+
+/* ---------- Stage 4: Write ---------- */
+function renderWrite(){
+  const targets = shuffle(EXPS).sort((a,b)=>mistakes[b.id]-mistakes[a.id]).slice(0,2);
+  let i = 0;
+  function show(){
+    const e = targets[i];
+    app.innerHTML = `
+      <h2>🖊️ Make Your Own Sentence</h2>
+      <p class="guide">나에게 가장 헷갈렸던 표현으로 직접 문장을 써 봐요. (${i+1} / 2)</p>
+      <p>Write one sentence about <b>your school life</b> using <span class="tag">${e.base}</span> <small>(${e.ko})</small></p>
+      <textarea id="ta" placeholder="Type your sentence here..."></textarea>
+      <div id="fb"></div>
+      <div class="right">
+        <button class="btn ghost" id="skip">Skip</button>
+        <button class="btn" id="chk">Check ✔</button>
+        <button class="btn" id="next" style="display:none">${i===1?'See Result ▶':'Next ▶'}</button>
+      </div>`;
+    const fb = document.getElementById('fb');
+    const advance = ()=>{ i++; i<targets.length ? show() : go(4); };
+    document.getElementById('skip').onclick=advance;
+    document.getElementById('next').onclick=advance;
+    document.getElementById('chk').onclick=()=>{
+      const v = document.getElementById('ta').value.trim();
+      const words = v.split(/\s+/).filter(Boolean).length;
+      if(!e.re.test(v)){
+        fb.innerHTML = `<div class="fb no">"${e.base}"가 문장에 들어 있는지 확인해 보세요. 시제에 맞게 바꿔 써도 괜찮아요. (예: ${e.ex.match(e.re) ? e.ex.match(e.re)[0] : e.base})</div>`;
+      } else if(words < 4){
+        fb.innerHTML = `<div class="fb no">조금 더 긴 문장으로 써 볼까요? (4단어 이상)</div>`;
+      } else {
+        fb.innerHTML = `<div class="fb ok">🎉 Nice! 표현을 잘 사용했어요.<br>Model: <i>“${esc(e.model)}”</i><br><small>내 문장과 비교해서 시제와 어순도 한 번 확인해 보세요.</small></div>`;
+        document.getElementById('chk').style.display='none';
+        document.getElementById('skip').style.display='none';
+        document.getElementById('next').style.display='inline-block';
+      }
+    };
+  }
+  show();
+}
+
+/* ---------- Stage 5: Result ---------- */
+function renderResult(){
+  const mastered = EXPS.filter(e=>mistakes[e.id]===0);
+  const review = EXPS.filter(e=>mistakes[e.id]>0);
+  const stars = quizCorrect>=6?'⭐⭐⭐':quizCorrect>=4?'⭐⭐':'⭐';
+  app.innerHTML = `
+    <h2>🏆 Result</h2>
+    <div class="big">${stars}</div>
+    <p style="text-align:center;font-size:18px">Fill-in score: <b>${quizCorrect} / 6</b></p>
+    <div class="res">
+      ${mastered.map(e=>`<div class="g">✅ ${e.base}</div>`).join('')}
+      ${review.map(e=>`<div class="r">🔁 ${e.base}<br><small>${e.ko} · ${e.ex}</small></div>`).join('')}
+    </div>
+    <p class="guide" style="margin-top:12px">${review.length?'🔁 표시된 표현은 한 번 더 복습해 보세요!':'모든 표현을 완벽하게 익혔어요! 🎉'}</p>
+    <div class="right"><button class="btn" id="again">Try again 🔄</button></div>`;
+  document.getElementById('again').onclick=()=>{
+    EXPS.forEach(e=>mistakes[e.id]=0); quizCorrect=0; startTime=Date.now(); go(0);
+  };
+}
+
+go(0);
+</script>
+</body>
+</html>
+```
+
+
